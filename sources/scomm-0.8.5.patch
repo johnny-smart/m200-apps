@@ -1,0 +1,104 @@
+--- src-orig/Client.cpp
++++ src/Client.cpp
+@@ -41,7 +41,7 @@
+ 
+ void CClient::ReceivePacket(unsigned char *buf, short size)
+ {
+-    printf("Client%d -> PC bytes:%d\n", con, size);
++//    printf("Client%d -> PC bytes:%d\n", con, size);
+     m_ppp->PutMessToBuff((unsigned char) con, buf, size);
+ }
+ 
+@@ -93,7 +93,7 @@
+                 int n;
+ 
+                 n = write(fd, tmp_buff, size + 2);
+-                printf("Client%d <- PC bytes:%d\n", con, n);
++                // printf("Client%d <- PC bytes:%d\n", con, n);
+             }
+             else
+             {
+--- src-orig/main.cpp
++++ src/main.cpp
+@@ -53,7 +53,7 @@
+     char log[100];
+ 
+     pthread_detach(pthread_self());
+-    unsigned int i = (unsigned int) arg;
++    unsigned int i = (unsigned int) ((size_t)arg);
+ 
+     sprintf(log, "Client%d connected! IP:%s\n", i, Client[i]->IP);
+     Loger(log);
+@@ -109,7 +109,7 @@
+ {
+     pthread_detach(pthread_self());
+ 
+-    InfoClient_fd = (int) (arg);
++    InfoClient_fd = (int) ((size_t)arg);
+ 
+     Loger("Info client connected!\n");
+ 
+@@ -238,7 +238,7 @@
+                                 {
+                                     if (pthread_create
+                                         (&Client_tid, NULL, &Client_ptread,
+-                                         (void *) i) != 0)
++                                         (void *) (intptr_t)(i)) != 0)
+                                     {
+                                         sprintf(log,
+                                                 "Can't create tread for Client%d! IP:%s\n",
+@@ -345,7 +345,7 @@
+                     {
+                         if (pthread_create
+                             (&InfoClient_tid, NULL, &InfoClient_ptread,
+-                             (void *) client_fd) != 0)
++                             (void *) (intptr_t)(client_fd)) != 0)
+                         {
+                             close(client_fd);
+                             TRACE("Can't create tread for info client!\n");
+@@ -405,7 +405,7 @@
+     if (parser.fDaemon)
+     {
+         Loger("Daemon mode on!\n");
+-        daemon(0, 0);
++        if(daemon(0, 0));
+     }
+ 
+     if (pthread_create(&InfoServer_tid, NULL, &InfoServer_ptread, NULL) != 0)
+--- src-orig/moduls.cpp
++++ src/moduls.cpp
+@@ -406,4 +406,5 @@
+         count++;
+     } while (retval < 0 && count < 2);
+ 
++    return EXIT_SUCCESS;
+ }
+--- src-orig/protocol.cpp
++++ src/protocol.cpp
+@@ -143,7 +143,7 @@
+ 
+                 if (n > 0)
+                 {
+-                    printf("PC -> ATS bytes:%d\n", n);
++                    // printf("PC -> ATS bytes:%d\n", n);
+                     m_dwWriteBytes += n;
+                 }
+                 else
+@@ -163,7 +163,7 @@
+                 {
+                     int n = write(ATS_fd, data, size);
+ 
+-                    printf("PC -> ATS bytes:%d\n", n);
++                    // printf("PC -> ATS bytes:%d\n", n);
+                     m_dwWriteBytes += n;
+                 }
+                 else
+@@ -292,7 +292,7 @@
+                       }
+                       else
+                       {
+-                          printf("PC <- ATS bytes:%d\n", frameLen);
++                          // printf("PC <- ATS bytes:%d\n", frameLen);
+                           m_dwReadGoodFrames++;
+                       }
+                   }

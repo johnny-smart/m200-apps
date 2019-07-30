@@ -1,0 +1,104 @@
+---
+version: "3.7"
+
+services:
+  scomm:
+    image: m200-apps
+    restart: always
+    user: "$M200_USER:$M200_GROUP"
+    # entrypoint: scomm
+    entrypoint: scomm $M200_HOST 10000 10001 -protv 11 -outdir /data
+    expose:
+     - "10001"
+     - "10101"
+    ports:
+     - "10001:10001"
+    volumes:
+     - data-volume:/data
+    # networks:
+    #   - default
+    #   - outside
+
+  spider:
+    image: m200-apps
+    restart: always
+    user: "$M200_USER:$M200_GROUP"
+    # entrypoint: spider
+    entrypoint: spider -scommip scomm -scommport 10001 -serverport 10002 -rotation 4 -outdir /data
+    expose:
+     - "10002"
+    depends_on:
+     - scomm
+    volumes:
+     - data-volume:/data
+
+  callbuilder:
+    image: m200-apps
+    restart: always
+    user: "$M200_USER:$M200_GROUP"
+    # entrypoint: callbuilder
+    entrypoint: callbuilder -spiderip spider -spiderport 10002 -rotation 1 -cdrformat 10 -outdir /data
+    expose:
+     - "10003"
+     - "10004"
+     - "10005"
+    depends_on:
+     - scomm
+     - spider
+    volumes:
+     - data-volume:/data
+
+  # tune:
+  #   image: m200-apps
+  #   restart: always
+  #   user: "$M200_USER:$M200_GROUP"
+  #   # entrypoint: tune
+  #   entrypoint: tune -scommip scomm -serverport 10007
+  #   depends_on:
+  #     - scomm
+  #   expose:
+  #     - "10007"
+  #   ports:
+  #     - "10007:10007"
+  #   volumes:
+  #     - data-volume:/data
+
+  # proxy:
+  #   image: m200-apps
+  #   restart: always
+  #   user: "$M200_USER:$M200_GROUP"
+  #   # entrypoint: proxy
+  #   entrypoint: proxy -scommip scomm -serverport 10008 -logfile proxy.log
+  #   depends_on:
+  #     - scomm
+  #   expose:
+  #     - "10008"
+  #   ports:
+  #     - "10008:10008"
+  #   volumes:
+  #     - data-volume:/data
+
+  # ping:
+  #   image: m200-apps
+  #   entrypoint: ping scomm
+  #   depends_on:
+  #     - scomm
+
+  tools:
+    image: m200-apps
+    # entrypoint: ping scomm
+    depends_on:
+      - scomm
+
+volumes:
+  data-volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: $M200_PATH
+
+# networks:
+# m200:
+# outside:
+#   external: true

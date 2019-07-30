@@ -1,0 +1,60 @@
+ARG FROM_VERSION=latest
+FROM i386/alpine:$FROM_VERSION as build
+
+RUN apk add --no-cache g++ make file libstdc++ libgcc libc6-compat xz
+
+WORKDIR /code
+
+COPY ./sources/ .
+
+### SCOMM
+RUN tar xf scomm-0.8.5.tar.gz \
+	&& cd scomm-0.8.5/ \
+	&& patch -p0 -i ../scomm-0.8.5.patch \
+	&& ./configure LDFLAGS=-lpthread \
+	&& make -j \
+	&& make install
+
+### SPIDER
+RUN tar xf spider-0.2.4.tar.gz \
+	&& cd spider-0.2.4/ \
+	&& patch -p0 -i ../spider-0.2.4.patch \
+	&& ./configure LDFLAGS=-lpthread \
+	&& make -j \
+	&& chmod +x ./install-sh \
+	&& make install
+
+### CALLBUILDER
+RUN tar xf callbuilder-0.6.2.1.tar.gz \
+	&& cd callbuilder-0.6.2/ \
+	&& patch -p0 -i ../callbuilder-0.6.2.1.patch \
+	&& ./configure LDFLAGS=-lpthread \
+	&& make -j \
+	&& chmod +x ./install-sh \
+	&& make install
+
+### TUNE
+RUN tar xf tune-0.2.0.tar.gz \
+	&& cd tune-0.2.0 \
+	&& patch -p0 -i ../tune-0.2.0.patch \
+	&& ./configure \
+	&& chmod +x ./install-sh \
+	&& make -j \
+	&& make install
+
+### SMPAlarm
+RUN mkdir SMPAlarm-5.83.17 \
+	&& tar xf SMPAlarm-5.83.17.tar.gz -C SMPAlarm-5.83.17 \
+	&& cd SMPAlarm-5.83.17 \
+	&& make -j \
+	&& cp ./smpalarm /usr/local/bin/
+
+### Other tools
+RUN tar xof cfgcpl.tar.gz -C /usr/local/bin/
+RUN tar xof cfgldr.tar.gz -C /usr/local/bin/
+RUN tar xof proxy-i386-linux.tar.gz -C /usr/local/bin/
+
+
+CMD echo Build done
+#CMD ["ash"]
+

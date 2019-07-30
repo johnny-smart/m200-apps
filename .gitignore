@@ -1,0 +1,13 @@
+# .gitignore
+
+#
+*.tar.gz
+*.tar.xz
+
+#
+*.log
+*.err
+*.jrn
+
+#
+.env

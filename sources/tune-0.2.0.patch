@@ -1,0 +1,27 @@
+--- src-orig/include/tune.h
++++ src/include/tune.h
+@@ -31,6 +31,7 @@
+ #include <netdb.h>
+ #include <arpa/inet.h>
+ #include <pthread.h>
++#include <unistd.h>
+
+ #ifdef FREE_BSD
+     #include <sys/wait.h>
+
++++ src/parse_tune.cpp
+@@ -1,3 +1,4 @@
++#include <ctype.h>
+ #include <include/tune.h>
+
+ CParser::CParser()
+@@ -38,7 +39,7 @@
+ int CParser::CheckIp(const char * ipstr)
+ {
+
+-    if (!strcmp(ipstr,"localhost"))
++    if (isalpha(ipstr[0]))
+     {
+         return 1;
+     }
+

@@ -1,0 +1,31 @@
+Only in src/: Makefile
+--- src-orig/callbuilder.cpp
++++ src/callbuilder.cpp
+@@ -527,7 +527,7 @@
+                     }
+                 }
+             }
+-            printf("%s", sTmp);
++//            printf("%s", sTmp);
+         }
+     }
+     return;
+--- src-orig/parser.cpp
++++ src/parser.cpp
+@@ -19,6 +19,7 @@
+  ***************************************************************************/
+ 
+ #include "callbuilder.h"
++#include <ctype.h>
+ 
+ extern char **environ;
+ 
+@@ -144,7 +145,7 @@
+ int CParser::CheckIp(const char *ipstr)
+ {
+ 
+-    if (!strcmp(ipstr, "localhost"))
++    if (isalpha(ipstr[0]))
+         return 1;
+ 
+     int len = strlen(ipstr);

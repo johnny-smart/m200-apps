@@ -1,0 +1,47 @@
+Only in src: Makefile
+--- src-orig/main.cpp
++++ src/main.cpp
+@@ -418,7 +418,6 @@
+         WriteToTfsFile(buff, sizeof(DWORD) + size);
+         WriteToTxtFile(tmp_str);
+     }
+-    printf("%s", tmp_str);
+ }
+ 
+ 
+@@ -598,7 +597,7 @@
+         case 0:
+         {
+             dup2(filedes[1],1);
+-            if(execl("/bin/uname","/bin/uname","-s","-m","-r",NULL)<0)
++            if(execl("/bin/uname","/bin/uname","-s","-m","-r",(void *)NULL)<0)
+                 return -1;
+             exit(EXIT_FAILURE);
+         }
+--- src-orig/main.h
++++ src/main.h
+@@ -31,6 +31,7 @@
+ #include <netdb.h>
+ #include <arpa/inet.h>
+ #include <pthread.h>
++#include <unistd.h>
+ 
+ #ifdef FREE_BSD
+     #include <sys/wait.h>
+--- src-orig/parser.cpp
++++ src/parser.cpp
+@@ -1,4 +1,5 @@
+ #include "main.h"
++#include <ctype.h>
+ 
+ #define RETURNERR(x) {Loger((x)); return -1;};
+ void Loger(const char* str);
+@@ -40,7 +41,7 @@
+ int CParser::CheckIp(const char * ipstr)
+ {
+ 
+-    if (!strcmp(ipstr,"localhost"))
++    if (isalpha(ipstr[0]))
+     {
+         return 1;
+     }
