@@ -1,7 +1,7 @@
 ARG FROM_VERSION=latest
 FROM i386/alpine:$FROM_VERSION
 
-RUN apk add --no-cache libstdc++ libgcc libc6-compat libnsl \
+RUN apk add --no-cache libstdc++ libgcc libc6-compat xz libnsl \
 	&& ln -s /usr/lib/libnsl.so.2.0.0 /usr/lib/libnsl.so.1
 
 ADD build/app-bin.tar.xz /usr/local/bin

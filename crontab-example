@@ -1,0 +1,4 @@
+# PBX M200
+20 20  *   *   *    cd /usr/local/src/m200-apps && /usr/local/bin/docker-compose run --rm tools ash -c 'cfgldr -scommip $(getent hosts scomm | cut -d" " -f1) -nummod ${PBX_MODULE} -r smp_conf.bin' | logger -t pbx_m200
+25 20  *   *   *    cd /usr/local/src/m200-apps && /usr/local/bin/docker-compose run --rm tools ash -c 'cfgcpl -p smp_conf.bin | xz > cfg_$(date +\%Y\%m\%d_\%H\%M).smp.xz' | logger -t pbx_m200
+25 20  *   *   *    cd /usr/local/src/m200-apps && /usr/local/bin/docker-compose run --rm tools cfgcpl -p smp_conf.bin > /srv/upload/m200.smp | logger -t pbx_m200

@@ -5,9 +5,9 @@ services:
   scomm:
     image: m200-apps
     restart: always
-    user: "$M200_USER:$M200_GROUP"
+    user: "$PBX_USER:$PBX_GROUP"
     # entrypoint: scomm
-    entrypoint: scomm $M200_HOST 10000 10001 -protv 11 -outdir /data
+    entrypoint: scomm $PBX_HOST 10000 10001 -protv 11 -outdir /data
     expose:
      - "10001"
      - "10101"
@@ -22,7 +22,7 @@ services:
   spider:
     image: m200-apps
     restart: always
-    user: "$M200_USER:$M200_GROUP"
+    user: "$PBX_USER:$PBX_GROUP"
     # entrypoint: spider
     entrypoint: spider -scommip scomm -scommport 10001 -serverport 10002 -rotation 4 -outdir /data
     expose:
@@ -35,7 +35,7 @@ services:
   callbuilder:
     image: m200-apps
     restart: always
-    user: "$M200_USER:$M200_GROUP"
+    user: "$PBX_USER:$PBX_GROUP"
     # entrypoint: callbuilder
     entrypoint: callbuilder -spiderip spider -spiderport 10002 -rotation 1 -cdrformat 10 -outdir /data
     expose:
@@ -51,7 +51,7 @@ services:
   # tune:
   #   image: m200-apps
   #   restart: always
-  #   user: "$M200_USER:$M200_GROUP"
+  #   user: "$PBX_USER:$PBX_GROUP"
   #   # entrypoint: tune
   #   entrypoint: tune -scommip scomm -serverport 10007
   #   depends_on:
@@ -66,7 +66,7 @@ services:
   # proxy:
   #   image: m200-apps
   #   restart: always
-  #   user: "$M200_USER:$M200_GROUP"
+  #   user: "$PBX_USER:$PBX_GROUP"
   #   # entrypoint: proxy
   #   entrypoint: proxy -scommip scomm -serverport 10008 -logfile proxy.log
   #   depends_on:
@@ -89,6 +89,10 @@ services:
     # entrypoint: ping scomm
     depends_on:
       - scomm
+    environment:
+     - PBX_MODULE
+    volumes:
+     - data-volume:/data
 
 volumes:
   data-volume:
@@ -96,7 +100,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: $M200_PATH
+      device: $PBX_PATH
 
 # networks:
 # m200:
